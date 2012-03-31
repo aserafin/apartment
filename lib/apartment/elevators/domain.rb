@@ -1,8 +1,9 @@
 module Apartment
   module Elevators
     # Provides a rack based db switching solution based on domains
-    # Assumes that tenant model is configured and has class method
-    # named "find_database_name_by_domain"
+    # Assumes that tenant model is configured, has class method
+    # named "find_by_domain" and object of this class responds to
+    # "database_name"
     class Domain
 
       def initialize(app)
@@ -13,8 +14,11 @@ module Apartment
         request = ActionDispatch::Request.new(env)
 
         domain = domain(request)
-        database = Apartment.tenant.blank? ? nil : Apartment.tenant.find_database_name_by_domain(domain)
-        Apartment::Database.switch database if database
+        Apartment.current_tenant = Apartment.tenant_model.nil? ? nil : Apartment.tenant_model.find_by_domain(domain)
+
+        raise NoTenantError, "Tenant for domain #{domain} cannot be found." if Apartment.current_tenant.nil?
+
+        Apartment::Database.switch Apartment.current_tenant.database_name
 
         @app.call(env)
       end

@@ -3,7 +3,7 @@ require 'apartment/railtie' if defined?(Rails)
 module Apartment
 
   class << self
-    attr_accessor :use_postgres_schemas, :seed_after_create, :prepend_environment
+    attr_accessor :use_postgres_schemas, :seed_after_create, :prepend_environment, :current_tenant
     attr_writer :database_names, :excluded_models, :tenant_model
 
     # configure apartment with available options
@@ -21,7 +21,7 @@ module Apartment
       @excluded_models || []
     end
 
-    def tenant
+    def tenant_model
       @tenant_model.blank? ? nil : @tenant_model.constantize
     end
 
@@ -71,4 +71,6 @@ module Apartment
   # Raised when an ActiveRecord object does not have the required database field on it
   class DJSerializationError < ApartmentError; end
 
+  # Raised when using Domain elevator and no tenant is found
+  class NoTenantError < ApartmentError; end
 end
