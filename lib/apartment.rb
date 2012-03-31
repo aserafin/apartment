@@ -4,7 +4,7 @@ module Apartment
 
   class << self
     attr_accessor :use_postgres_schemas, :seed_after_create, :prepend_environment
-    attr_writer :database_names, :excluded_models
+    attr_writer :database_names, :excluded_models, :tenant_model
 
     # configure apartment with available options
     def configure
@@ -21,6 +21,10 @@ module Apartment
       @excluded_models || []
     end
 
+    def tenant
+      @tenant_model.blank? ? nil : @tenant_model.constantize
+    end
+
   end
 
   autoload :Database, 'apartment/database'
@@ -34,6 +38,7 @@ module Apartment
 
   module Elevators
     autoload :Subdomain, 'apartment/elevators/subdomain'
+    autoload :Domain,    'apartment/elevators/domain'
   end
 
   module Delayed
