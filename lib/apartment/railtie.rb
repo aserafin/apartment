@@ -15,6 +15,8 @@ module Apartment
         config.seed_after_create = false
         config.prepend_environment = false
         config.tenant_model = nil
+        config.main_domain = nil
+        config.account_not_found_site = nil
       end
     end
 

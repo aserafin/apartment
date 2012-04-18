@@ -105,6 +105,17 @@ module Apartment
       end
       alias_method :seed, :seed_data
 
+      #  Load the rails seed_fu files into the db
+      #
+      def seed_fu_data
+        if Object.const_defined?("SeedFu")
+          SeedFu.seed
+        else
+          raise SeedFuNotFoundError, "SeedFu class is not defined!"
+        end
+      end
+      alias_method :seed_fu, :seed_fu_data
+
     protected
 
       #   Create the database

@@ -3,7 +3,7 @@ require 'apartment/railtie' if defined?(Rails)
 module Apartment
 
   class << self
-    attr_accessor :use_postgres_schemas, :seed_after_create, :prepend_environment, :current_tenant
+    attr_accessor :use_postgres_schemas, :seed_after_create, :prepend_environment, :current_tenant, :main_domain, :account_not_found_site
     attr_writer :database_names, :excluded_models, :tenant_model
 
     # configure apartment with available options
@@ -24,7 +24,6 @@ module Apartment
     def tenant_model
       @tenant_model.blank? ? nil : @tenant_model.constantize
     end
-
   end
 
   autoload :Database, 'apartment/database'
@@ -73,4 +72,7 @@ module Apartment
 
   # Raised when using Domain elevator and no tenant is found
   class NoTenantError < ApartmentError; end
+
+  # Raised when trying to use SeedFu without gem being installed
+  class SeedFuNotFoundError < ApartmentError; end
 end

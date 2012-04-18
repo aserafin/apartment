@@ -30,6 +30,16 @@ apartment_namespace = namespace :apartment do
     end
   end
 
+  desc "Seed_fu all multi-tenant databases"
+  task :seed_fu => 'db:seed_fu' do
+    Apartment.database_names.each do |db|
+      puts "Seeding #{db} database"
+      Apartment::Database.process(db) do
+         Apartment::Database.seed_fu
+      end
+    end
+  end
+
   namespace :migrate do
 
     desc 'Runs the "up" for a given migration VERSION across all multi-tenant dbs.'

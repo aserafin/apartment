@@ -14,13 +14,19 @@ module Apartment
         request = ActionDispatch::Request.new(env)
 
         domain = domain(request)
-        Apartment.current_tenant = Apartment.tenant_model.nil? ? nil : Apartment.tenant_model.find_by_domain(domain)
 
-        raise NoTenantError, "Tenant for domain #{domain} cannot be found." if Apartment.current_tenant.nil?
-
-        Apartment::Database.switch Apartment.current_tenant.database_name
-
-        @app.call(env)
+        if domain != Apartment.main_domain
+          Apartment.current_tenant = Apartment.tenant_model.nil? ? nil : Apartment.tenant_model.find_by_domain(domain)
+          if Apartment.current_tenant.nil?
+            raise NoTenantError, "Tenant for domain #{domain} cannot be found." if Apartment.account_not_found_site.blank?
+            [301, {"Location" => Apartment.account_not_found_site}, self]
+          else
+            Apartment::Database.switch Apartment.current_tenant.database_name
+            @app.call(env)
+          end
+        else
+          @app.call(env)
+        end
       end
 
       def domain(request)
