@@ -25,6 +25,8 @@ module Apartment
             @app.call(env)
           end
         else
+    	  Apartment.current_tenant = nil
+    	  Apartment::Database.switch(nil)
           @app.call(env)
         end
       end
